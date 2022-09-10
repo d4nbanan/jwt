@@ -28,7 +28,7 @@ function createToken(privateKey, requestBody) {
         rbh: calculateHash(requestBody)
     };
 
-    return jwt.sign(payload, privateKey, {algorithm: algorithm, expiresIn: "1m"});
+    return jwt.sign(payload, privateKey, {algorithm: algorithm, expiresIn: "1m", noTimestamp: true});
 }
 
 const start = async () => {
