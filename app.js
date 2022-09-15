@@ -29,12 +29,17 @@ function createToken(privateKey, requestBody) {
     var payload = {
         iss: issuer,
         aud: audience,
-        sub: subject
+        sub: subject,
+        // rbh: calculateHash(requestBody)
     };
+
+    console.log(requestBody)
 
     if(requestBody){
         payload.rbh = calculateHash(requestBody)
     }
+
+    console.log(payload)
 
     return jwt.sign(payload, privateKey, {algorithm: algorithm, expiresIn: "1m", noTimestamp: true});
 }
@@ -56,9 +61,9 @@ const start = async () => {
                 let token;
 
                 if(method !== 'get'){
-                    token = createToken(privateKey, false);
-                } else {
                     token = createToken(privateKey, body);
+                } else {
+                    token = createToken(privateKey, false);
                 }
 
                 if(login === req.headers['login'] && password === req.headers['password']){
@@ -82,6 +87,7 @@ const start = async () => {
 
                         res.status(200).json(response.data);
                     } catch (err) {                        
+                        console.log(err)
                         res.status(400).json(err.response.data);
                     }
                 } else {
