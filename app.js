@@ -29,9 +29,12 @@ function createToken(privateKey, requestBody) {
     var payload = {
         iss: issuer,
         aud: audience,
-        sub: subject,
-        rbh: calculateHash(requestBody)
+        sub: subject
     };
+
+    if(requestBody){
+        payload.rbh = calculateHash(requestBody)
+    }
 
     return jwt.sign(payload, privateKey, {algorithm: algorithm, expiresIn: "1m", noTimestamp: true});
 }
@@ -43,12 +46,19 @@ const start = async () => {
         app.post('/api/generateToken', async (req, res) => {
             try {
                 const body = req.body;
-                const token = createToken(privateKey, body);
 
                 const url = req.headers['url'];
                 const method = req.headers['method'];
                 if(!url){
                     return res.status(400).json({message: "url error"});
+                }
+
+                let token;
+
+                if(method !== 'get'){
+                    token = createToken(privateKey, false);
+                } else {
+                    token = createToken(privateKey, body);
                 }
 
                 if(login === req.headers['login'] && password === req.headers['password']){
